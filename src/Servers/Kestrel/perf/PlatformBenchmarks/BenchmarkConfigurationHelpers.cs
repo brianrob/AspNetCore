@@ -27,17 +27,6 @@ namespace PlatformBenchmarks
             {
                 theadCount = value;
             }
-
-            if (string.Equals(webHost, "Libuv", StringComparison.OrdinalIgnoreCase))
-            {
-                builder.UseLibuv(options =>
-                {
-                    if (theadCount.HasValue)
-                    {
-                        options.ThreadCount = theadCount.Value;
-                    }
-                });
-            }
             else if (string.Equals(webHost, "Sockets", StringComparison.OrdinalIgnoreCase))
             {
                 builder.UseSockets(options =>
