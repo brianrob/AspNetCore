@@ -314,14 +314,19 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal
 
             _connectionClosed = true;
 
-            ThreadPool.UnsafeQueueUserWorkItem(state =>
-            {
-                state.CancelConnectionClosedToken();
+            ThreadPool.UnsafeQueueUserWorkItem(
+                CompleteFireConnectionClosed,
+                this,
+                preferLocal: false);
+        }
 
-                state._waitForConnectionClosedTcs.TrySetResult(null);
-            },
-            this,
-            preferLocal: false);
+        // Implemented as a static method instead of a lambda in FireConnectionClosed
+        // to avoid allocating a display class per-call.
+        private static void CompleteFireConnectionClosed(SocketConnection connection)
+        {
+            state.CancelConnectionClosedToken();
+
+            state._waitForConnectionClosedTcs.TrySetResult(null);
         }
 
         private void Shutdown(Exception shutdownReason)
