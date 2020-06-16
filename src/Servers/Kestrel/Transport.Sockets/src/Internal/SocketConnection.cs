@@ -20,6 +20,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal
         private static readonly int MinAllocBufferSize = SlabMemoryPool.BlockSize / 2;
         private static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         private static readonly bool IsMacOS = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+        private static readonly ConnectionAbortedException s_gracefulShutdownReason = new ConnectionAbortedException("The Socket transport's send loop completed gracefully.");
 
         private readonly Socket _socket;
         private readonly ISocketsTrace _trace;
@@ -340,7 +341,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal
                 // shutdownReason should only be null if the output was completed gracefully, so no one should ever
                 // ever observe the nondescript ConnectionAbortedException except for connection middleware attempting
                 // to half close the connection which is currently unsupported.
-                _shutdownReason = shutdownReason ?? new ConnectionAbortedException("The Socket transport's send loop completed gracefully.");
+                _shutdownReason = shutdownReason ?? s_gracefulShutdownReason;
 
                 _trace.ConnectionWriteFin(ConnectionId, _shutdownReason.Message);
 
