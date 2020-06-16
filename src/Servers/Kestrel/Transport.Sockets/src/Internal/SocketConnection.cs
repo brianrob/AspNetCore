@@ -324,9 +324,9 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.Internal
         // to avoid allocating a display class per-call.
         private static void CompleteFireConnectionClosed(SocketConnection connection)
         {
-            state.CancelConnectionClosedToken();
+            connection.CancelConnectionClosedToken();
 
-            state._waitForConnectionClosedTcs.TrySetResult(null);
+            connection._waitForConnectionClosedTcs.TrySetResult(null);
         }
 
         private void Shutdown(Exception shutdownReason)
